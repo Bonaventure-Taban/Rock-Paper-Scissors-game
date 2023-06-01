@@ -1,62 +1,96 @@
+const choices = document.querySelectorAll('.choice');
+const score = document.getElementById('score');
+const result = document.getElementById('result');
+const restart = document.getElementById('restart');
+const modal = document.querySelector('.modal');
+const scoreboard = {
+    player: 0,
+    computer: 0
+}
+
+//Function to play game
+function play(e){
+    restart.style.display = 'inline-block';
+    const playerChoice = e.target.id;
+    const computerChoice = getComputerChoice();
+    const winner = getWinner(playerChoice,computerChoice);
+    displayWinner(winner, computerChoice);
+}
+
 // Function to receive computer's Input
 
 function getComputerChoice(){
-    let choice = ["Rock", "Paper", "Scissors"];
+    let choice = ["rock", "paper", "scissors"];
     let randomIndex = Math.floor(Math.random() * choice.length);
-    let computerChoice = choice[randomIndex]
-    return computerChoice;
+    let computerSelection = choice[randomIndex];
+    return computerSelection;
 }
-//Function to play a single round of Rock Paper Scissors
 
-chances = 5;
-let playerScore = 0;
-let computerScore = 0;
-
-function playGround(playerSelection, computerSelection){
-    console.log(`Player Selection is: ${playerSelection}`);
-    console.log(`Computer Selection is: ${computerSelection}`);
-
-    if (playerSelection === computerSelection){
-        console.log("It's a tie!!");
+//Function to get the Winner 
+function getWinner(playerChoice, computerChoice){
+    if (playerChoice === computerChoice){
+        return "Tie";
     }
-    else if( playerSelection === "Rock" && computerSelection === "Scissors" ||
-             playerSelection === "Paper" && computerSelection === "Rock" ||
-             playerSelection === "Scissors" && computerSelection === "Paper"){
-                console.log("Player Wins this round!");
-                playerScore++;
-               }
+    else if( playerChoice === "rock" && computerChoice === "scissors" ||
+        playerChoice === "paper" && computerChoice === "rock" ||
+        playerChoice === "scissors" && computerChoice === "paper"){
+        return "Player";     
+    }
     else{
-        console.log("Computer Wins this round!");
-        computerScore++;
-               }
-
-    console.log(`Player Score ${playerScore}`);
-    console.log(`Computer Score ${computerScore}`);
-    console.log("----------------------------");
-
-    
+        return "Computer";
+    }
 }
 
+//Function to display winner
+function displayWinner(winner, computerChoice){
+    if(winner === "Player"){
+        scoreboard.player++; // Increment player score
 
-function game(){
-    
-    for(let i = 0; i < chances; i++){
+        // display modal result
+        result.innerHTML = `
+        <p> Computer chose <strong>${computerChoice}</strong></p>
+        <h1 class="text-win">You Win!</h1>
+        `;
+    }else if(winner === "Computer"){
+        scoreboard.computer++; //Increment computer score
 
-        let playerSelection = prompt("Please enter your choice: ");
-        let computerSelection = getComputerChoice();
-
-        playGround(playerSelection,computerSelection);
+        //display modal result
+        result.innerHTML = `
+        <p>Computer chose <strong>${computerChoice}</strong></p>
+        <h1 class="text-lose">You Lose!</h1>
+        `;
+    }else {
+        result.innerHTML = `
+        <p>Computer chose <strong>${computerChoice}</strong></p>
+        <h1 class="text-lose">It's a Tie!</h1>
+        `;
     }
 
+    //display score
+    score.innerHTML=`
+        <p>Player: ${scoreboard.player}</p>
+        <p>Computer: ${scoreboard.computer}</p>
+    `;
+
+    modal.style.display= "block";
 }
 
-game();
-console.log("Game Over!")
-
-if (playerScore > computerScore){
-    console.log("Player Won the game!");
-} else if(computerScore > playerScore){
-    console.log("Computer Won the game");
-}else{
-    console.log("It's a tie!");
+function restartGame(){
+    scoreboard.player = 0;
+    scoreboard.computer = 0;
+    score.innerHTML = `
+    <p>Player: 0 </p>
+    <p>Computer: 0</p>
+    `;
 }
+
+function clearModal(e){
+    if(e.target == modal){
+        modal.style.display = "none";
+    }
+}
+
+//Event Listeners
+choices.forEach(choice => choice.addEventListener('click', play));
+window.addEventListener('click', clearModal);
+restart.addEventListener('click', restartGame);
